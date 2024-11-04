@@ -63,6 +63,47 @@ scene.add(topLight);
 const ambientLight = new THREE.AmbientLight(0x333333, objToRender === "dino" ? 5 : 1);
 scene.add(ambientLight);
 
+// Basic setup
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+// Adjust intensity based on the model type (e.g., "dino" has higher intensity)
+const objToRender = "dino"; // Replace this with dynamic value as needed
+const ambientIntensity = objToRender === "dino" ? 5 : 1;
+
+// Add ambient light
+const ambientLight = new THREE.AmbientLight(0xffffff, ambientIntensity);
+scene.add(ambientLight);
+
+// Add a directional light to cast additional illumination
+const directionalLight = new THREE.DirectionalLight(0xffffff, 2); // Adjust intensity as needed
+directionalLight.position.set(5, 10, 7.5).normalize(); // Position above and to the side of the model
+scene.add(directionalLight);
+
+// Load model (for example, using an OBJLoader)
+const loader = new THREE.OBJLoader();
+loader.load(
+  'https://path-to-your-model.obj', // Replace with your model path
+  function (object) {
+    scene.add(object);
+  },
+  function (xhr) { console.log((xhr.loaded / xhr.total * 100) + '% loaded'); },
+  function (error) { console.error('An error happened', error); }
+);
+
+camera.position.z = 10;
+
+// Render loop
+function animate() {
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+}
+animate();
+
+
 //This adds controls to the camera, so we can rotate / zoom it with the mouse
 if (objToRender === "dino") {
   controls = new OrbitControls(camera, renderer.domElement);
