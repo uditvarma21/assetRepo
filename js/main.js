@@ -53,8 +53,8 @@ const renderer = new THREE.WebGLRenderer({ alpha: true }); // Alpha allows for a
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.getElementById("container3D").appendChild(renderer.domElement);
 
-// Position the camera in front of the object and zoom out (total zoom out 300% from the original)
-camera.position.set(0, 0, 45); // Adjust the z-position to zoom out by around 200%
+// Position the camera in front of the object and zoom out more (total zoom out around 600% from the original)
+camera.position.set(30, 0, 0); // Position to the side and rotated clockwise by 90 degrees
 
 // Add ambient light to the scene
 const ambientIntensity = objToRender === "dino" ? 5 : 1;
@@ -77,9 +77,9 @@ let rotationSpeed = 0.01; // Speed of rotation in radians
 function animate() {
   requestAnimationFrame(animate);
 
-  // Rotate the object vertically
+  // Rotate the object around the Y-axis
   if (object) {
-    object.rotation.x += rotationSpeed; // Auto-rotate around the X-axis
+    object.rotation.y += rotationSpeed; // Auto-rotate around the Y-axis
   }
 
   // Render the scene
