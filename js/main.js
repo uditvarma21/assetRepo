@@ -1,7 +1,5 @@
 // Import the THREE.js library
 import * as THREE from "https://cdn.skypack.dev/three@0.129.0/build/three.module.js";
-// Import OrbitControls to allow the camera to move around the scene
-import { OrbitControls } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js";
 // Import GLTFLoader to allow loading the .gltf file
 import { GLTFLoader } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/GLTFLoader.js";
 
@@ -15,7 +13,6 @@ const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerH
 
 // Keep the 3D object in a global variable for later access
 let object;
-let controls;
 
 // Set the object to render
 const objToRender = 'dino';
@@ -37,6 +34,8 @@ loader.load(
       }
     });
 
+    // Rotate the object down by 90 degrees (in radians)
+    object.rotation.x = Math.PI / 2; // 90 degrees in radians
     scene.add(object);
   },
   function (xhr) {
@@ -54,8 +53,8 @@ const renderer = new THREE.WebGLRenderer({ alpha: true }); // Alpha allows for a
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.getElementById("container3D").appendChild(renderer.domElement);
 
-// Set the camera position based on `objToRender`
-camera.position.z = objToRender === "dino" ? 25 : 500;
+// Position the camera in front of the object and zoom out
+camera.position.set(0, 0, 15); // Adjust the z-position to zoom out by 50%
 
 // Add ambient light to the scene
 const ambientIntensity = objToRender === "dino" ? 5 : 1;
@@ -71,17 +70,17 @@ const directionalLight2 = new THREE.DirectionalLight(0xffffff, 2); // Second dir
 directionalLight2.position.set(-5, 10, -7.5).normalize(); // Positioning it on the opposite side
 scene.add(directionalLight2);
 
-// Add OrbitControls if the object is "dino"
-if (objToRender === "dino") {
-  controls = new OrbitControls(camera, renderer.domElement);
-}
+// Auto-rotate the object horizontally
+let rotationSpeed = 0.01; // Speed of rotation in radians
 
 // Render loop
 function animate() {
   requestAnimationFrame(animate);
 
-  // Update controls, if present
-  if (controls) controls.update();
+  // Rotate the object horizontally
+  if (object) {
+    object.rotation.y += rotationSpeed; // Auto-rotate around the Y-axis
+  }
 
   // Render the scene
   renderer.render(scene, camera);
