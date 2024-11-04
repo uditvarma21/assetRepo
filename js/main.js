@@ -7,6 +7,9 @@ import { GLTFLoader } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/l
 
 // Create a Three.js scene
 const scene = new THREE.Scene();
+// Set the background color of the scene to white
+scene.background = new THREE.Color(0xffffff); // White background
+
 // Create a new camera with perspective
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
@@ -26,6 +29,14 @@ loader.load(
   function (gltf) {
     // Add the loaded object to the scene
     object = gltf.scene;
+    
+    // Change the color of the object to red
+    object.traverse(function (child) {
+      if (child.isMesh) {
+        child.material.color.set(0xff0000); // Set mesh color to red
+      }
+    });
+
     scene.add(object);
   },
   function (xhr) {
@@ -48,13 +59,17 @@ camera.position.z = objToRender === "dino" ? 25 : 500;
 
 // Add ambient light to the scene
 const ambientIntensity = objToRender === "dino" ? 5 : 1;
-const ambientLight = new THREE.AmbientLight(0xffffff, ambientIntensity);
+const ambientLight = new THREE.AmbientLight(0xffffff, ambientIntensity); // Ambient light for overall illumination
 scene.add(ambientLight);
 
-// Add a directional light to cast additional illumination
-const directionalLight = new THREE.DirectionalLight(0xffffff, 2); // Adjust intensity as needed
-directionalLight.position.set(5, 10, 7.5).normalize(); // Position the light source
-scene.add(directionalLight);
+// Add more directional lights to cast additional illumination
+const directionalLight1 = new THREE.DirectionalLight(0xffffff, 2); // First directional light
+directionalLight1.position.set(5, 10, 7.5).normalize();
+scene.add(directionalLight1);
+
+const directionalLight2 = new THREE.DirectionalLight(0xffffff, 2); // Second directional light
+directionalLight2.position.set(-5, 10, -7.5).normalize(); // Positioning it on the opposite side
+scene.add(directionalLight2);
 
 // Add OrbitControls if the object is "dino"
 if (objToRender === "dino") {
