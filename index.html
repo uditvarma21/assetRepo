@@ -1,7 +1,6 @@
 <!-- HTML structure -->
 <div id="container3D"></div>
 <div id="controls">
-  <p>Current Tilt Angle (Y-axis): <span id="tiltAngle">0</span>°</p>
   <p>Current Zoom Level: <span id="zoomLevel">100</span>%</p>
 </div>
 
@@ -24,9 +23,7 @@
 <script type="module">
 // Import the THREE.js library
 import * as THREE from "https://cdn.skypack.dev/three@0.129.0/build/three.module.js";
-// Import OrbitControls to allow the camera to move around the scene
-import { OrbitControls } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js";
-// Import GLTFLoader to allow loading the .gltf file
+// Import GLTFLoader to load the .gltf file
 import { GLTFLoader } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/GLTFLoader.js";
 
 // Create a Three.js scene
@@ -36,10 +33,11 @@ scene.background = new THREE.Color(0xffffff); // White background
 
 // Create a new camera with perspective
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const defaultDistance = 200; // Adjusted distance for zoom
+camera.position.z = defaultDistance;
 
 // Keep the 3D object in a global variable for later access
 let object;
-let controls;
 
 // Set the object to render
 const objToRender = 'dino';
@@ -53,7 +51,10 @@ loader.load(
   function (gltf) {
     // Add the loaded object to the scene
     object = gltf.scene;
-    
+
+    // Tilt the model by 90 degrees to get a front view
+    object.rotation.x = Math.PI / 2;
+
     // Change the color of the object to red
     object.traverse(function (child) {
       if (child.isMesh) {
@@ -78,50 +79,36 @@ const renderer = new THREE.WebGLRenderer({ alpha: true }); // Alpha allows for a
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.getElementById("container3D").appendChild(renderer.domElement);
 
-// Default camera distance to object for 100% zoom level
-const defaultDistance = 75;
-camera.position.z = defaultDistance;
-
 // Add ambient light to the scene
-const ambientIntensity = objToRender === "dino" ? 5 : 1;
-const ambientLight = new THREE.AmbientLight(0xffffff, ambientIntensity); // Ambient light for overall illumination
+const ambientLight = new THREE.AmbientLight(0xffffff, 5); // Ambient light for overall illumination
 scene.add(ambientLight);
 
-// Add more directional lights to cast additional illumination
-const directionalLight1 = new THREE.DirectionalLight(0xffffff, 2); // First directional light
+// Add directional lights to provide additional illumination
+const directionalLight1 = new THREE.DirectionalLight(0xffffff, 2);
 directionalLight1.position.set(5, 10, 7.5).normalize();
 scene.add(directionalLight1);
 
-const directionalLight2 = new THREE.DirectionalLight(0xffffff, 2); // Second directional light
-directionalLight2.position.set(-5, 10, -7.5).normalize(); // Positioning it on the opposite side
+const directionalLight2 = new THREE.DirectionalLight(0xffffff, 2);
+directionalLight2.position.set(-5, 10, -7.5).normalize();
 scene.add(directionalLight2);
 
-// Add OrbitControls if the object is "dino"
-if (objToRender === "dino") {
-  controls = new OrbitControls(camera, renderer.domElement);
-}
+// Remove mouse controls (no OrbitControls used)
 
-// Get HTML elements for displaying tilt angle and zoom level
-const tiltAngleDisplay = document.getElementById("tiltAngle");
+// Get HTML element for displaying zoom level
 const zoomLevelDisplay = document.getElementById("zoomLevel");
 
 // Render loop
 function animate() {
   requestAnimationFrame(animate);
 
-  // Update controls, if present
-  if (controls) controls.update();
-
-  // Update tilt angle and zoom level in UI
+  // 360-degree rotation around the X-axis
   if (object) {
-    // Calculate the tilt angle on Y-axis in degrees
-    const tiltAngle = THREE.MathUtils.radToDeg(object.rotation.y).toFixed(1);
-    tiltAngleDisplay.textContent = tiltAngle;
-
-    // Calculate zoom level as a percentage
-    const zoomLevel = ((camera.position.z / defaultDistance) * 100).toFixed(1);
-    zoomLevelDisplay.textContent = zoomLevel + "%";
+    object.rotation.x += 0.01; // Adjust speed if needed
   }
+
+  // Update zoom level in UI
+  const zoomLevel = ((camera.position.z / defaultDistance) * 100).toFixed(1);
+  zoomLevelDisplay.textContent = zoomLevel + "%";
 
   // Render the scene
   renderer.render(scene, camera);
