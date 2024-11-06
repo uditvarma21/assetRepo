@@ -1,27 +1,3 @@
-<!-- HTML structure -->
-<div id="container3D"></div>
-<div id="controls">
-  <p>Current Tilt Angle: <span id="tiltAngle">0</span>°</p>
-  <p>Current Zoom Level: <span id="zoomLevel">25</span></p>
-</div>
-
-<style>
-  #container3D {
-    width: 100%;
-    height: 100vh;
-  }
-  #controls {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 10px;
-    border-radius: 8px;
-    font-family: Arial, sans-serif;
-  }
-</style>
-
-<script type="module">
 // Import the THREE.js library
 import * as THREE from "https://cdn.skypack.dev/three@0.129.0/build/three.module.js";
 // Import OrbitControls to allow the camera to move around the scene
@@ -100,27 +76,12 @@ if (objToRender === "dino") {
   controls = new OrbitControls(camera, renderer.domElement);
 }
 
-// Get HTML elements for displaying tilt angle and zoom level
-const tiltAngleDisplay = document.getElementById("tiltAngle");
-const zoomLevelDisplay = document.getElementById("zoomLevel");
-
 // Render loop
 function animate() {
   requestAnimationFrame(animate);
 
   // Update controls, if present
   if (controls) controls.update();
-
-  // Update tilt angle and zoom level in UI
-  if (object) {
-    // Calculate tilt angle in degrees
-    const tiltAngle = THREE.MathUtils.radToDeg(object.rotation.x).toFixed(1);
-    tiltAngleDisplay.textContent = tiltAngle;
-
-    // Calculate zoom level (distance between camera and object)
-    const zoomLevel = camera.position.distanceTo(object.position).toFixed(1);
-    zoomLevelDisplay.textContent = zoomLevel;
-  }
 
   // Render the scene
   renderer.render(scene, camera);
@@ -135,4 +96,3 @@ window.addEventListener("resize", function () {
 
 // Start the animation loop
 animate();
-</script>
