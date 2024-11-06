@@ -8,7 +8,7 @@ scene.background = new THREE.Color(0xffffff); // Set background color to white
 
 // Create a perspective camera with adjusted zoom level
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.z = 100; // Zoomed out by 150% from previous position
+camera.position.z = 200; // Zoomed out for a larger field of view
 
 let object; // Variable to store the loaded 3D object
 
@@ -22,13 +22,14 @@ loader.load(
   function (gltf) {
     object = gltf.scene;
 
+    // Change object color to red
     object.traverse(function (child) {
       if (child.isMesh) {
         child.material.color.set(0xff0000); // Set object color to red
       }
     });
 
-    // Rotate the object -90 degrees to display a front view
+    // Rotate the object -90 degrees on the X-axis to display a front view
     object.rotation.x = -Math.PI / 2;
 
     scene.add(object);
