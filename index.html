@@ -1,8 +1,8 @@
 <!-- HTML structure -->
 <div id="container3D"></div>
 <div id="controls">
-  <p>Current Tilt Angle: <span id="tiltAngle">0</span>°</p>
-  <p>Current Zoom Level: <span id="zoomLevel">25</span></p>
+  <p>Current Tilt Angle (Y-axis): <span id="tiltAngle">0</span>°</p>
+  <p>Current Zoom Level: <span id="zoomLevel">100</span>%</p>
 </div>
 
 <style>
@@ -78,8 +78,9 @@ const renderer = new THREE.WebGLRenderer({ alpha: true }); // Alpha allows for a
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.getElementById("container3D").appendChild(renderer.domElement);
 
-// Set the camera position based on `objToRender`
-camera.position.z = objToRender === "dino" ? 25 : 500;
+// Default camera distance to object for 100% zoom level
+const defaultDistance = 75;
+camera.position.z = defaultDistance;
 
 // Add ambient light to the scene
 const ambientIntensity = objToRender === "dino" ? 5 : 1;
@@ -113,13 +114,13 @@ function animate() {
 
   // Update tilt angle and zoom level in UI
   if (object) {
-    // Calculate tilt angle in degrees
-    const tiltAngle = THREE.MathUtils.radToDeg(object.rotation.x).toFixed(1);
+    // Calculate the tilt angle on Y-axis in degrees
+    const tiltAngle = THREE.MathUtils.radToDeg(object.rotation.y).toFixed(1);
     tiltAngleDisplay.textContent = tiltAngle;
 
-    // Calculate zoom level (distance between camera and object)
-    const zoomLevel = camera.position.distanceTo(object.position).toFixed(1);
-    zoomLevelDisplay.textContent = zoomLevel;
+    // Calculate zoom level as a percentage
+    const zoomLevel = ((camera.position.z / defaultDistance) * 100).toFixed(1);
+    zoomLevelDisplay.textContent = zoomLevel + "%";
   }
 
   // Render the scene
