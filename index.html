@@ -1,123 +1,16 @@
-<!-- HTML structure -->
-<div id="container3D"></div>
-<div id="controls">
-  <p>Current Zoom Level: <span id="zoomLevel">100</span>%</p>
-</div>
-
-<style>
-  #container3D {
-    width: 100%;
-    height: 100vh;
-  }
-  #controls {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 10px;
-    border-radius: 8px;
-    font-family: Arial, sans-serif;
-  }
-</style>
-
-<script type="module">
-// Import the THREE.js library
-import * as THREE from "https://cdn.skypack.dev/three@0.129.0/build/three.module.js";
-// Import GLTFLoader to load the .gltf file
-import { GLTFLoader } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/GLTFLoader.js";
-
-// Create a Three.js scene
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xffffff); // Set background color to white
-
-// Create a new camera with perspective
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-const defaultDistance = 300; // Further zoomed out from previous 200
-camera.position.z = defaultDistance;
-
-// Keep the 3D object in a global variable for later access
-let object;
-
-// Set the object to render
-const objToRender = 'dino';
-
-// Instantiate a GLTFLoader for the .gltf file
-const loader = new GLTFLoader();
-
-// Load the file based on `objToRender`
-loader.load(
-  `models/${objToRender}/scene.gltf`,
-  function (gltf) {
-    // Add the loaded object to the scene
-    object = gltf.scene;
-    
-    // Tilt 90 degrees in the opposite direction for front view
-    object.rotation.x = -Math.PI / 2;
-
-    // Change the color of the object to red
-    object.traverse(function (child) {
-      if (child.isMesh) {
-        child.material.color.set(0xff0000); // Set mesh color to red
-      }
-    });
-
-    scene.add(object);
-  },
-  function (xhr) {
-    // Log the loading progress
-    console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-  },
-  function (error) {
-    // Log any errors during loading
-    console.error(error);
-  }
-);
-
-// Instantiate a renderer and set its size
-const renderer = new THREE.WebGLRenderer({ alpha: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.getElementById("container3D").appendChild(renderer.domElement);
-
-// Add ambient light to the scene
-const ambientLight = new THREE.AmbientLight(0xffffff, 5);
-scene.add(ambientLight);
-
-// Add directional lights
-const directionalLight1 = new THREE.DirectionalLight(0xffffff, 2);
-directionalLight1.position.set(5, 10, 7.5).normalize();
-scene.add(directionalLight1);
-
-const directionalLight2 = new THREE.DirectionalLight(0xffffff, 2);
-directionalLight2.position.set(-5, 10, -7.5).normalize();
-scene.add(directionalLight2);
-
-// Get HTML element for displaying zoom level
-const zoomLevelDisplay = document.getElementById("zoomLevel");
-
-// Render loop
-function animate() {
-  requestAnimationFrame(animate);
-
-  // Rotate around the Y-axis for a horizontal spin
-  if (object) {
-    object.rotation.y += 0.01; // Adjust speed if needed
-  }
-
-  // Update zoom level in UI
-  const zoomLevel = ((camera.position.z / defaultDistance) * 100).toFixed(1);
-  zoomLevelDisplay.textContent = zoomLevel + "%";
-
-  // Render the scene
-  renderer.render(scene, camera);
-}
-
-// Resize event listener to handle window resizing
-window.addEventListener("resize", function () {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-});
-
-// Start the animation loop
-animate();
-</script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Model Viewer</title>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    #container3D { width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+  <div id="container3D"></div>
+  <script src="main.js"></script>
+</body>
+</html>
