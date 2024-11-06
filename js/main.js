@@ -1,5 +1,31 @@
+<!-- HTML structure -->
+<div id="container3D"></div>
+<div id="controls">
+  <p>Current Tilt Angle: <span id="tiltAngle">0</span>°</p>
+  <p>Current Zoom Level: <span id="zoomLevel">25</span></p>
+</div>
+
+<style>
+  #container3D {
+    width: 100%;
+    height: 100vh;
+  }
+  #controls {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 8px;
+    font-family: Arial, sans-serif;
+  }
+</style>
+
+<script type="module">
 // Import the THREE.js library
 import * as THREE from "https://cdn.skypack.dev/three@0.129.0/build/three.module.js";
+// Import OrbitControls to allow the camera to move around the scene
+import { OrbitControls } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js";
 // Import GLTFLoader to allow loading the .gltf file
 import { GLTFLoader } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/GLTFLoader.js";
 
@@ -13,6 +39,7 @@ const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerH
 
 // Keep the 3D object in a global variable for later access
 let object;
+let controls;
 
 // Set the object to render
 const objToRender = 'dino';
@@ -34,8 +61,6 @@ loader.load(
       }
     });
 
-    // Rotate the object down by 90 degrees (in radians)
-    object.rotation.x = Math.PI / 2; // 90 degrees in radians
     scene.add(object);
   },
   function (xhr) {
@@ -53,8 +78,8 @@ const renderer = new THREE.WebGLRenderer({ alpha: true }); // Alpha allows for a
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.getElementById("container3D").appendChild(renderer.domElement);
 
-// Position the camera in front of the object and zoom out more (total zoom out around 600% from the original)
-camera.position.set(30, 0, 0); // Position to the side and rotated clockwise by 90 degrees
+// Set the camera position based on `objToRender`
+camera.position.z = objToRender === "dino" ? 25 : 500;
 
 // Add ambient light to the scene
 const ambientIntensity = objToRender === "dino" ? 5 : 1;
@@ -70,16 +95,31 @@ const directionalLight2 = new THREE.DirectionalLight(0xffffff, 2); // Second dir
 directionalLight2.position.set(-5, 10, -7.5).normalize(); // Positioning it on the opposite side
 scene.add(directionalLight2);
 
-// Auto-rotate the object vertically
-let rotationSpeed = 0.01; // Speed of rotation in radians
+// Add OrbitControls if the object is "dino"
+if (objToRender === "dino") {
+  controls = new OrbitControls(camera, renderer.domElement);
+}
+
+// Get HTML elements for displaying tilt angle and zoom level
+const tiltAngleDisplay = document.getElementById("tiltAngle");
+const zoomLevelDisplay = document.getElementById("zoomLevel");
 
 // Render loop
 function animate() {
   requestAnimationFrame(animate);
 
-  // Rotate the object around the Y-axis
+  // Update controls, if present
+  if (controls) controls.update();
+
+  // Update tilt angle and zoom level in UI
   if (object) {
-    object.rotation.y += rotationSpeed; // Auto-rotate around the Y-axis
+    // Calculate tilt angle in degrees
+    const tiltAngle = THREE.MathUtils.radToDeg(object.rotation.x).toFixed(1);
+    tiltAngleDisplay.textContent = tiltAngle;
+
+    // Calculate zoom level (distance between camera and object)
+    const zoomLevel = camera.position.distanceTo(object.position).toFixed(1);
+    zoomLevelDisplay.textContent = zoomLevel;
   }
 
   // Render the scene
@@ -95,3 +135,4 @@ window.addEventListener("resize", function () {
 
 // Start the animation loop
 animate();
+</script>
