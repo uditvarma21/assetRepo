@@ -1,34 +1,34 @@
-// Import the THREE.js library
+// Import the THREE.js library and the GLTFLoader from Skypack CDN
 import * as THREE from "https://cdn.skypack.dev/three@0.129.0/build/three.module.js";
-// Import GLTFLoader to allow loading the .gltf file
 import { GLTFLoader } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/GLTFLoader.js";
 
-// Create a Three.js scene
+// Create the Three.js scene
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xffffff); // Set background color to white
 
-// Create a perspective camera and adjust zoom level
+// Create a perspective camera with adjusted zoom level
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.z = 100; // Zoomed out by 150% from previous position
 
-let object; // For the loaded 3D object
+let object; // Variable to store the loaded 3D object
 
-// Instantiate a GLTFLoader to load the .gltf file
+// Instantiate GLTFLoader to load the .gltf file
 const loader = new GLTFLoader();
-const objToRender = 'dino'; // Set object to render
+const objToRender = 'dino'; // Set the object to render
 
-// Load the object and adjust its orientation
+// Load the object, apply color, and adjust its orientation
 loader.load(
-  `models/${objToRender}/scene.gltf`,
+  `models/${objToRender}/scene.gltf`, // Update this path to your actual model path
   function (gltf) {
     object = gltf.scene;
+
     object.traverse(function (child) {
       if (child.isMesh) {
-        child.material.color.set(0xff0000); // Change color to red
+        child.material.color.set(0xff0000); // Set object color to red
       }
     });
 
-    // Tilt the object by -90 degrees to get a front view
+    // Rotate the object -90 degrees to display a front view
     object.rotation.x = -Math.PI / 2;
 
     scene.add(object);
@@ -41,30 +41,30 @@ loader.load(
   }
 );
 
-// Add lights to the scene
-const ambientLight = new THREE.AmbientLight(0xffffff, 2); // Ambient light for general illumination
+// Add ambient light and directional light to illuminate the object
+const ambientLight = new THREE.AmbientLight(0xffffff, 2);
 scene.add(ambientLight);
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 2); // Directional light for highlights
+const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
 directionalLight.position.set(5, 10, 7.5).normalize();
 scene.add(directionalLight);
 
-// Instantiate renderer
+// Set up the renderer
 const renderer = new THREE.WebGLRenderer({ alpha: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.getElementById("container3D").appendChild(renderer.domElement);
 
-// Render loop with rotation on the Z-axis
+// Animation loop with rotation on the Z-axis
 function animate() {
   requestAnimationFrame(animate);
 
-  // Rotate object around Z-axis for 360-degree rotation
+  // Rotate object around Z-axis
   if (object) object.rotation.z += 0.01;
 
   renderer.render(scene, camera);
 }
 
-// Adjust on window resize
+// Adjust camera on window resize
 window.addEventListener("resize", function () {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
